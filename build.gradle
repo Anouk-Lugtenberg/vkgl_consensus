@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+}
+
+group 'org.molgenis'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+//This adds the external dependencies to the jar: https://discuss.gradle.org/t/how-to-include-dependencies-in-jar/19571/5
+//Add extraLibs instead of compile at dependencies.
+configurations {
+    extraLibs
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    extraLibs group: 'commons-io', name: 'commons-io', version: '2.4'
+    // https://mvnrepository.com/artifact/commons-cli/commons-cli
+    extraLibs group: 'commons-cli', name: 'commons-cli', version: '1.2'
+
+    configurations.compile.extendsFrom(configurations.extraLibs)
+}
+
+jar {
+    archiveName = 'vkgl_consensus.jar'
+    manifest {
+        attributes 'Main-Class':'org.molgenis.vkgl_consensus.Main'
+    }
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
